@@ -1,6 +1,7 @@
 # Secrets / local config (Cloudinary cloud name + preset, Firebase keys)
 .env
 lib/config/env.dart
+env.json
 google-services.json
 GoogleService-Info.plist
 lib/firebase_options.dart
