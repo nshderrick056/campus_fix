@@ -92,8 +92,8 @@ Json newIncidentToMap({
   );
   return {
     ...draftFieldsToMap(draft),
-    if (photoUrl != null) 'photoUrl': photoUrl,
-    if (photoPublicId != null) 'photoPublicId': photoPublicId,
+    'photoUrl': ?photoUrl,
+    'photoPublicId': ?photoPublicId,
     'status': IncidentStatus.submitted.value,
     'reporterId': reporter.uid,
     'reporterName': reporter.displayName,
