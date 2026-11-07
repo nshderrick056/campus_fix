@@ -1,0 +1,142 @@
+rules_version = '2';
+
+// CampusFix security rules. They enforce the rules in docs/CONTRACT.md; the
+// app's own checks only give friendlier messages.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- helpers -------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function aluEmail() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower()
+             .matches('.*@(alustudent|alueducation)[.]com$');
+    }
+
+    function verified() {
+      return aluEmail() && request.auth.token.email_verified == true;
+    }
+
+    function isStaff() {
+      return verified()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid))
+             .data.role == 'staff';
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function validStatus(s) {
+      return s in ['submitted', 'in_progress', 'resolved', 'rejected'];
+    }
+
+    function validCategory(c) {
+      return c in ['facilities', 'water', 'electricity', 'safety',
+                   'sanitation', 'furniture', 'it_wifi', 'other'];
+    }
+
+    function validIncidentFields(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 120
+        && d.description is string && d.description.size() <= 2000
+        && d.location is string && d.location.size() > 0 && d.location.size() <= 200
+        && validCategory(d.category)
+        && d.isAnonymous is bool;
+    }
+
+    // ---- users/{uid} ---------------------------------------------------
+
+    match /users/{uid} {
+      // Own profile is readable before verification (the app needs the
+      // role to route). Staff can read any profile.
+      allow read: if (aluEmail() && request.auth.uid == uid) || isStaff();
+
+      // Created at registration, before the email is verified. Role is
+      // always "student"; staff are promoted in the Firebase console.
+      allow create: if aluEmail()
+        && request.auth.uid == uid
+        && request.resource.data.keys()
+             .hasOnly(['name', 'email', 'role', 'department', 'createdAt'])
+        && request.resource.data.role == 'student'
+        && request.resource.data.name is string
+        && request.resource.data.email == request.auth.token.email.lower();
+
+      // Users may edit their name/department, never their role.
+      allow update: if verified()
+        && request.auth.uid == uid
+        && changedKeys().hasOnly(['name', 'department']);
+
+      allow delete: if false;
+
+      // ---- users/{uid}/notifications/{id} ------------------------------
+
+      match /notifications/{notificationId} {
+        allow read: if verified() && request.auth.uid == uid;
+
+        // Only the read flag can change.
+        allow update: if verified()
+          && request.auth.uid == uid
+          && changedKeys().hasOnly(['read'])
+          && request.resource.data.read is bool;
+
+        // Staff create one when they change a report's status.
+        allow create: if isStaff()
+          && request.resource.data.keys().hasOnly(
+               ['incidentId', 'incidentTitle', 'status', 'note', 'createdAt', 'read'])
+          && request.resource.data.incidentId is string
+          && validStatus(request.resource.data.status)
+          && request.resource.data.read == false;
+
+        allow delete: if false;
+      }
+    }
+
+    // ---- incidents/{id} ------------------------------------------------
+
+    match /incidents/{incidentId} {
+      allow read: if verified();
+
+      allow create: if verified()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.status == 'submitted'
+        && validIncidentFields(request.resource.data)
+        && request.resource.data.statusHistory is list
+        && request.resource.data.statusHistory.size() == 1
+        && request.resource.data.statusHistory[0].status == 'submitted'
+        && request.resource.data.statusHistory[0].changedBy == request.auth.uid;
+
+      // Reporter: edit content only while submitted; status, reporter and
+      // history are off limits.
+      allow update: if verified()
+        && resource.data.reporterId == request.auth.uid
+        && resource.data.status == 'submitted'
+        && changedKeys().hasOnly(['title', 'description', 'category', 'location',
+                                  'isAnonymous', 'photoUrl', 'photoPublicId',
+                                  'updatedAt'])
+        && validIncidentFields(request.resource.data);
+
+      // Staff: change status and append exactly one statusHistory entry.
+      allow update: if isStaff()
+        && changedKeys().hasOnly(['status', 'statusHistory', 'updatedAt'])
+        && validStatus(request.resource.data.status)
+        && request.resource.data.statusHistory.size()
+             == resource.data.statusHistory.size() + 1
+        && request.resource.data.statusHistory[0:resource.data.statusHistory.size()]
+             == resource.data.statusHistory
+        && request.resource.data.statusHistory[resource.data.statusHistory.size()].status
+             == request.resource.data.status
+        && request.resource.data.statusHistory[resource.data.statusHistory.size()].changedBy
+             == request.auth.uid;
+
+      allow delete: if verified()
+        && resource.data.reporterId == request.auth.uid
+        && resource.data.status == 'submitted';
+    }
+  }
+}
