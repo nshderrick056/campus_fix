@@ -36,3 +36,22 @@ ios/Pods/
 ios/.symlinks/
 ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
+
+# Misc (from Flutter's default template)
+*.class
+*.log
+*.pyc
+*.ipr
+*.iws
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+/coverage/
+
+# Symbolication / obfuscation
+app.*.symbols
+app.*.map.json
