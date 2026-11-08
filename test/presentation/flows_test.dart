@@ -27,10 +27,17 @@ void main() {
   testWidgets('login validates the ALU email domain', (tester) async {
     await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
     await tester.pumpAndSettle();
+    expect(find.textContaining('Only verified'), findsNothing);
+    await tester.enterText(find.byType(TextFormField).at(0), 'someone@gmail');
+    await tester.pump();
+    expect(find.textContaining('Only verified'), findsNothing, reason: 'domain not finished yet');
     await tester.enterText(find.byType(TextFormField).at(0), 'someone@gmail.com');
-    await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Only @alustudent.com'), findsOneWidget);
+    expect(find.textContaining('Only verified'), findsOneWidget, reason: 'non-ALU email shows the banner');
+    // The validator's own message is covered in validators_test.dart.
+    await tester.enterText(find.byType(TextFormField).at(0), 'amina@alustudent.com');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Only verified'), findsNothing, reason: 'ALU email hides it');
   });
 
   testWidgets('a student signs in and lands on Home with their reports', (tester) async {

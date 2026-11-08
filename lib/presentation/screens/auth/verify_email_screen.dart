@@ -94,6 +94,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 style: t.bodyMedium?.copyWith(color: c.textMuted),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 16),
+              const InfoBanner(
+                icon: Symbols.badge_rounded,
+                message: 'Every new account starts as a Student. Staff access is granted by the Facilities Office.',
+              ),
               const Spacer(),
               LoadingButton(label: 'I have verified my email', loading: _checking, onPressed: _check),
               const SizedBox(height: 12),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/validators.dart';
 import '../../widgets/brand_logo.dart';
+import '../../widgets/common.dart';
 import '../../widgets/theme_toggle_button.dart';
 
 /// ALU campus photo behind the top of the login/register screens.
@@ -196,6 +198,42 @@ class _FallbackHero extends StatelessWidget {
         Positioned(right: 70, bottom: 34, child: bubble(Symbols.check_circle_rounded, 44, c.card, c.resolved)),
         Positioned(left: 78, bottom: 30, child: bubble(Symbols.chair_rounded, 40, c.card, c.primary)),
       ],
+    );
+  }
+}
+
+/// "Only ALU accounts" banner, shown only once [email] holds a complete
+/// address outside the ALU domains.
+class AluOnlyBanner extends StatelessWidget {
+  const AluOnlyBanner({super.key, required this.email});
+
+  final TextEditingController email;
+
+  static bool isNonAluEmail(String value) {
+    final v = value.trim();
+    final at = v.indexOf('@');
+    // Wait until the domain looks finished ("x@gmail.com"), not mid-typing.
+    final complete = at > 0 && v.substring(at + 1).contains('.') && !v.endsWith('.');
+    return complete && Validators.aluEmail(v) != null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: email,
+      builder: (_, value, _) => AnimatedSize(
+        duration: const Duration(milliseconds: 200),
+        child: isNonAluEmail(value.text)
+            ? const Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: InfoBanner(
+                  icon: Symbols.verified_user_rounded,
+                  warning: true,
+                  message: 'Only verified @alustudent.com and @alueducation.com accounts can sign in.',
+                ),
+              )
+            : const SizedBox(width: double.infinity),
+      ),
     );
   }
 }

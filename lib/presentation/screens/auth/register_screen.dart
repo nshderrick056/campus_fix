@@ -93,6 +93,7 @@ class _RegisterViewState extends State<_RegisterView> {
               decoration: const InputDecoration(hintText: 'name@alustudent.com', prefixIcon: Icon(Symbols.mail_rounded)),
               validator: Validators.aluEmail,
             ),
+            AluOnlyBanner(email: _email),
             const SizedBox(height: 16),
             const FieldLabel('Password'),
             PasswordField(
@@ -113,11 +114,6 @@ class _RegisterViewState extends State<_RegisterView> {
               onChanged: (_) => setState(() {}),
               validator: (v) => Validators.confirmPassword(v, _password.text),
               onSubmitted: (_) => _submit(),
-            ),
-            const SizedBox(height: 16),
-            const InfoBanner(
-              icon: Symbols.badge_rounded,
-              message: 'Every new account starts as a Student. Staff access is granted by the Facilities Office.',
             ),
             const SizedBox(height: 20),
             BlocBuilder<AuthFormCubit, AuthFormState>(

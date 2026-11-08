@@ -87,6 +87,7 @@ class _LoginViewState extends State<_LoginView> {
               ),
               validator: Validators.aluEmail,
             ),
+            AluOnlyBanner(email: _email),
             const SizedBox(height: 16),
             const FieldLabel('Password'),
             PasswordField(
@@ -119,11 +120,6 @@ class _LoginViewState extends State<_LoginView> {
                 Text('New to CampusFix?', style: t.bodyMedium?.copyWith(color: c.textMuted)),
                 TextButton(onPressed: () => context.go(Routes.register), child: const Text('Create an account')),
               ],
-            ),
-            const SizedBox(height: 4),
-            const InfoBanner(
-              icon: Symbols.verified_user_rounded,
-              message: 'Only verified @alustudent.com and @alueducation.com accounts can sign in.',
             ),
           ],
         ),
