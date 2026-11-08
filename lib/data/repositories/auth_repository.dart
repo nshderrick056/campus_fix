@@ -20,6 +20,12 @@ abstract interface class AuthRepository {
     required String password,
   });
 
+  /// Signs in with a Google account, which must be an ALU email (code
+  /// 'email-not-allowed' otherwise). Creates the student profile on first
+  /// sign-in. Google accounts are already verified. Code 'cancelled' if the
+  /// user closes the Google window.
+  Future<void> signInWithGoogle();
+
   Future<void> sendVerificationEmail();
 
   /// Reloads the auth user (e.g. after they tap the email link) and

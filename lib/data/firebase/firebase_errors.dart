@@ -25,6 +25,13 @@ RepositoryException mapFirebaseError(Object error) {
           'weak-password', 'Choose a stronger password (at least 6 characters).'),
       'too-many-requests' => const RepositoryException('too-many-requests',
           'Too many attempts. Please wait a moment and try again.'),
+      'popup-closed-by-user' ||
+      'cancelled-popup-request' ||
+      'web-context-canceled' ||
+      'canceled' =>
+        const RepositoryException('cancelled', 'Google sign-in was cancelled.'),
+      'account-exists-with-different-credential' => const RepositoryException(
+          'account-exists', 'This email already has a password account. Sign in with your password.'),
       'requires-recent-login' => const RepositoryException(
           'requires-recent-login', 'Please sign in again to continue.'),
       'network-request-failed' || 'unavailable' || 'deadline-exceeded' =>

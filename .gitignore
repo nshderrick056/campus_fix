@@ -56,3 +56,6 @@ migrate_working_dir/
 # Symbolication / obfuscation
 app.*.symbols
 app.*.map.json
+
+# Local test account credentials
+test-accounts.local.txt

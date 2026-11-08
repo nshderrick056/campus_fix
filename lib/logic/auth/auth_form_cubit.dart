@@ -32,6 +32,8 @@ class AuthFormCubit extends Cubit<AuthFormState> {
   Future<void> signIn(String email, String password) =>
       _run(() => _auth.signIn(email: email.trim(), password: password));
 
+  Future<void> signInWithGoogle() => _run(_auth.signInWithGoogle);
+
   Future<void> register(String name, String email, String password) =>
       _run(() => _auth.register(name: name.trim(), email: email.trim(), password: password));
 

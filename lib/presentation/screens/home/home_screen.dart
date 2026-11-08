@@ -13,6 +13,7 @@ import '../../../logic/notifications/notifications_cubit.dart';
 import '../../../models/incident_status.dart';
 import '../../widgets/common.dart';
 import '../../widgets/report_card.dart';
+import '../../widgets/theme_toggle_button.dart';
 
 /// Student dashboard: greeting, report CTA, summary counts, recent reports.
 class HomeScreen extends StatelessWidget {
@@ -44,6 +45,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                const ThemeToggleButton(),
                 const _BellButton(),
                 const SizedBox(width: 10),
                 UserAvatar(initials: user.initials),

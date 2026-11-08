@@ -117,6 +117,15 @@ void main() {
       await auth.close();
     });
 
+    test('Google sign-in signs the user straight in (already verified)', () async {
+      final backend = createFakeBackend(latency: Duration.zero);
+      final auth = AuthCubit(backend.auth);
+      await AuthFormCubit(backend.auth).signInWithGoogle();
+      await Future<void>.delayed(Duration.zero);
+      expect(auth.state.status, AuthStatus.signedIn);
+      await auth.close();
+    });
+
     test('new accounts start unverified as students', () async {
       final backend = createFakeBackend(latency: Duration.zero);
       final auth = AuthCubit(backend.auth);

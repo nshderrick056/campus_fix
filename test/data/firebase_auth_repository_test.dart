@@ -8,6 +8,10 @@ import 'package:mocktail/mocktail.dart';
 
 class _MockAuth extends Mock implements FirebaseAuth {}
 
+class _MockUser extends Mock implements User {}
+
+class _MockCredential extends Mock implements UserCredential {}
+
 void main() {
   late _MockAuth auth;
   late FirebaseAuthRepository repo;
@@ -37,6 +41,22 @@ void main() {
     verifyZeroInteractions(auth);
   });
 
+  test('non-ALU Google accounts are deleted and rejected', () async {
+    final user = _MockUser();
+    final cred = _MockCredential();
+    registerFallbackValue(GoogleAuthProvider());
+    when(() => cred.user).thenReturn(user);
+    when(() => user.email).thenReturn('someone@gmail.com');
+    when(() => user.delete()).thenAnswer((_) async {});
+    when(() => auth.signInWithProvider(any())).thenAnswer((_) async => cred);
+
+    await expectLater(
+      repo.signInWithGoogle(),
+      throwsA(isA<RepositoryException>().having((e) => e.code, 'code', 'email-not-allowed')),
+    );
+    verify(() => user.delete()).called(1);
+  });
+
   test('auth error codes become friendly RepositoryExceptions', () async {
     when(() => auth.signInWithEmailAndPassword(
           email: any(named: 'email'),
@@ -55,5 +75,6 @@ void main() {
     expect(mapFirebaseError(FirebaseAuthException(code: 'network-request-failed')).code,
         'network');
     expect(mapFirebaseError(StateError('boom')).code, 'unknown');
+    expect(mapFirebaseError(FirebaseAuthException(code: 'popup-closed-by-user')).code, 'cancelled');
   });
 }

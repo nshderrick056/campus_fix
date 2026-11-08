@@ -12,6 +12,7 @@ import '../../../logic/incidents/incidents_cubit.dart';
 import '../../../models/incident_status.dart';
 import '../../widgets/common.dart';
 import '../../widgets/report_card.dart';
+import '../../widgets/theme_toggle_button.dart';
 import '../reports/reports_screen.dart';
 
 /// Staff home: workload counts and the reports that need attention,
@@ -61,6 +62,7 @@ class _QueueView extends StatelessWidget {
                       style: t.headlineMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
+              const ThemeToggleButton(),
               UserAvatar(initials: user.initials),
             ]),
             const SizedBox(height: 8),

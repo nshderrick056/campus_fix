@@ -6,4 +6,7 @@ class ThemeCubit extends Cubit<ThemeMode> {
   ThemeCubit() : super(ThemeMode.system);
 
   void set(ThemeMode mode) => emit(mode);
+
+  /// Switch to the opposite of what is on screen now.
+  void toggle(Brightness current) => emit(current == Brightness.dark ? ThemeMode.light : ThemeMode.dark);
 }

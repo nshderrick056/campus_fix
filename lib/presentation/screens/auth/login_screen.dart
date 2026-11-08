@@ -3,15 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/repositories/auth_repository.dart';
 import '../../../logic/auth/auth_form_cubit.dart';
 import '../../../logic/form_status.dart';
-import '../../widgets/brand_logo.dart';
 import '../../widgets/common.dart';
+import 'auth_layout.dart';
 import 'password_field.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -70,67 +69,63 @@ class _LoginViewState extends State<_LoginView> {
         if (state.status == FormStatus.failure) showAppSnack(context, state.error!, error: true);
         if (state.status == FormStatus.success && state.info != null) showAppSnack(context, state.info!);
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+      child: Form(
+        key: _formKey,
+        child: AuthLayout(
+          title: 'Welcome Back!',
+          subtitle: 'Sign in to report campus issues and track their progress.',
+          children: [
+            const FieldLabel('ALU email'),
+            TextFormField(
+              controller: _email,
+              keyboardType: TextInputType.emailAddress,
+              autofillHints: const [AutofillHints.email],
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                hintText: 'name@alustudent.com',
+                prefixIcon: Icon(Symbols.mail_rounded),
+              ),
+              validator: Validators.aluEmail,
+            ),
+            const SizedBox(height: 16),
+            const FieldLabel('Password'),
+            PasswordField(
+              controller: _password,
+              label: 'Password',
+              hint: 'Your password',
+              validator: Validators.loginPassword,
+              onSubmitted: (_) => _submit(),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(onPressed: _forgotPassword, child: const Text('Forgot password?')),
+            ),
+            const SizedBox(height: 8),
+            BlocBuilder<AuthFormCubit, AuthFormState>(
+              builder: (context, state) => Column(children: [
+                GradientButton(label: 'Sign in', loading: state.isSubmitting, onPressed: _submit),
+                const SizedBox(height: 20),
+                SocialSignIn(
+                  caption: 'Or continue with',
+                  onGoogle: state.isSubmitting ? null : context.read<AuthFormCubit>().signInWithGoogle,
+                ),
+              ]),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Align(alignment: Alignment.centerLeft, child: BrandLogo()),
-                const SizedBox(height: 12),
-                Text(AppConstants.appName, style: t.labelLarge?.copyWith(color: c.primary)),
-                const SizedBox(height: 8),
-                Text('Welcome back', style: t.headlineMedium),
-                const SizedBox(height: 6),
-                Text('Sign in with your ALU account to report campus issues and track their progress.',
-                    style: t.bodyLarge?.copyWith(color: c.textMuted)),
-                const SizedBox(height: 28),
-                TextFormField(
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  autofillHints: const [AutofillHints.email],
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'ALU email',
-                    hintText: 'name@alustudent.com',
-                    prefixIcon: Icon(Symbols.mail_rounded),
-                  ),
-                  validator: Validators.aluEmail,
-                ),
-                const SizedBox(height: 16),
-                PasswordField(
-                  controller: _password,
-                  label: 'Password',
-                  validator: Validators.loginPassword,
-                  onSubmitted: (_) => _submit(),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(onPressed: _forgotPassword, child: const Text('Forgot password?')),
-                ),
-                const SizedBox(height: 8),
-                BlocBuilder<AuthFormCubit, AuthFormState>(
-                  builder: (context, state) =>
-                      LoadingButton(label: 'Sign in', loading: state.isSubmitting, onPressed: _submit),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text('New to CampusFix?', style: t.bodyMedium?.copyWith(color: c.textMuted)),
-                    TextButton(onPressed: () => context.go(Routes.register), child: const Text('Create an account')),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                const InfoBanner(
-                  icon: Symbols.verified_user_rounded,
-                  message: 'Only verified @alustudent.com and @alueducation.com accounts can sign in.',
-                ),
+                Text('New to CampusFix?', style: t.bodyMedium?.copyWith(color: c.textMuted)),
+                TextButton(onPressed: () => context.go(Routes.register), child: const Text('Create an account')),
               ],
             ),
-          ),
+            const SizedBox(height: 4),
+            const InfoBanner(
+              icon: Symbols.verified_user_rounded,
+              message: 'Only verified @alustudent.com and @alueducation.com accounts can sign in.',
+            ),
+          ],
         ),
       ),
     );

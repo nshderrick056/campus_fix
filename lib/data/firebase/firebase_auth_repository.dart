@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../core/constants/app_constants.dart';
 import '../../models/app_user.dart';
@@ -133,6 +134,31 @@ class FirebaseAuthRepository implements AuthRepository {
       _refresh.add(null);
     });
   }
+
+  @override
+  Future<void> signInWithGoogle() => guard(() async {
+        final provider = GoogleAuthProvider()
+          ..setCustomParameters({'prompt': 'select_account'});
+        final cred = kIsWeb
+            ? await _auth.signInWithPopup(provider)
+            : await _auth.signInWithProvider(provider);
+        final user = cred.user!;
+        final email = user.email ?? '';
+        if (!isAllowedEmail(email)) {
+          // Remove the account Firebase just created for the non-ALU Google user.
+          await user.delete();
+          _checkDomain(email);
+        }
+        final doc = _users.doc(user.uid);
+        if (!(await doc.get()).exists) {
+          await doc.set(newUserProfileToMap(
+            name: user.displayName ?? email.split('@').first,
+            email: email,
+            now: DateTime.now(),
+          ));
+        }
+        _refresh.add(null);
+      });
 
   @override
   Future<void> sendVerificationEmail() => guard(() async {

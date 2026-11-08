@@ -37,8 +37,7 @@ class _PasswordFieldState extends State<PasswordField> {
       onFieldSubmitted: widget.onSubmitted,
       validator: widget.validator,
       decoration: InputDecoration(
-        labelText: widget.label,
-        hintText: widget.hint,
+        hintText: widget.hint ?? widget.label,
         prefixIcon: const Icon(Symbols.lock_rounded),
         suffixIcon: IconButton(
           tooltip: _hidden ? 'Show password' : 'Hide password',

@@ -190,6 +190,14 @@ class FakeAuthRepository implements AuthRepository {
     _s.changed();
   }
 
+  /// In the fake, "Google" signs in the demo student.
+  @override
+  Future<void> signInWithGoogle() async {
+    await _s.delay();
+    _uid = 'u-amina';
+    _s.changed();
+  }
+
   @override
   Future<void> sendVerificationEmail() => _s.delay();
 

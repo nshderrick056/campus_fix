@@ -74,7 +74,7 @@ void main() {
     await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Welcome Back!'), findsOneWidget);
   });
 
   testWidgets('app follows the system dark mode', (tester) async {
@@ -84,8 +84,20 @@ void main() {
     await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.text('Welcome back'));
+    final context = tester.element(find.text('Welcome Back!'));
     expect(Theme.of(context).brightness, Brightness.dark);
     expect(context.colors, AppColors.dark);
+  });
+
+  testWidgets('the theme toggle switches dark to light', (tester) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+
+    await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Switch to light mode'));
+    await tester.pumpAndSettle();
+
+    expect(Theme.of(tester.element(find.text('Welcome Back!'))).brightness, Brightness.light);
   });
 }
