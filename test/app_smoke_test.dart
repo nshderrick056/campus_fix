@@ -1,5 +1,6 @@
 import 'package:campus_incident_app/core/theme/app_colors.dart';
 import 'package:campus_incident_app/core/theme/app_theme.dart';
+import 'package:campus_incident_app/dev/fake_backend.dart';
 import 'package:campus_incident_app/main.dart';
 import 'package:campus_incident_app/models/incident_category.dart';
 import 'package:campus_incident_app/models/incident_status.dart';
@@ -33,8 +34,7 @@ void main() {
         final cardShape = theme.cardTheme.shape! as RoundedRectangleBorder;
         expect(cardShape.borderRadius, BorderRadius.circular(16));
 
-        final input =
-            theme.inputDecorationTheme.border! as OutlineInputBorder;
+        final input = theme.inputDecorationTheme.border! as OutlineInputBorder;
         expect(input.borderRadius, BorderRadius.circular(12));
 
         expect(theme.chipTheme.shape, isA<StadiumBorder>());
@@ -61,16 +61,7 @@ void main() {
     test('IncidentCategory has the 8 agreed categories', () {
       expect(
         IncidentCategory.values.map((c) => c.label),
-        [
-          'Facilities',
-          'Water',
-          'Electricity',
-          'Safety',
-          'Sanitation',
-          'Furniture',
-          'IT & Wi-Fi',
-          'Other',
-        ],
+        ['Facilities', 'Water', 'Electricity', 'Safety', 'Sanitation', 'Furniture', 'IT & Wi-Fi', 'Other'],
       );
       for (final category in IncidentCategory.values) {
         expect(IncidentCategory.fromValue(category.value), category);
@@ -79,20 +70,21 @@ void main() {
     });
   });
 
-  testWidgets('app boots to the themed placeholder screen', (tester) async {
-    await tester.pumpWidget(const CampusFixApp());
+  testWidgets('signed-out app boots to the login screen', (tester) async {
+    await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
+    await tester.pumpAndSettle();
 
-    expect(find.text('CampusFix'), findsOneWidget);
-    expect(find.byType(Card), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
   });
 
   testWidgets('app follows the system dark mode', (tester) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
-    await tester.pumpWidget(const CampusFixApp());
+    await tester.pumpWidget(CampusFixApp(backend: createFakeBackend(latency: Duration.zero)));
+    await tester.pumpAndSettle();
 
-    final context = tester.element(find.text('CampusFix'));
+    final context = tester.element(find.text('Welcome back'));
     expect(Theme.of(context).brightness, Brightness.dark);
     expect(context.colors, AppColors.dark);
   });

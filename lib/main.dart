@@ -1,39 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'core/constants/app_constants.dart';
+import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/screens/placeholder_screen.dart';
+import 'data/backend.dart';
+import 'data/repositories/auth_repository.dart';
+import 'data/repositories/incident_repository.dart';
+import 'data/repositories/notification_repository.dart';
+import 'dev/fake_backend.dart';
+import 'logic/auth/auth_cubit.dart';
+import 'logic/theme/theme_cubit.dart';
+
+/// `flutter run --dart-define=FAKE_BACKEND=true` runs on in-memory data.
+const useFakeBackend = bool.fromEnvironment('FAKE_BACKEND', defaultValue: true);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // TODO(firebase): after running `flutterfire configure` (see README.md),
-  // initialise Firebase here:
-  //
-  //   import 'package:firebase_core/firebase_core.dart';
-  //   import 'firebase_options.dart';
-  //
-  //   await Firebase.initializeApp(
-  //     options: DefaultFirebaseOptions.currentPlatform,
-  //   );
-
-  runApp(const CampusFixApp());
+  // TODO(backend): once the backend branch is merged and `flutterfire
+  // configure` has run, switch the default above to false and use:
+  //   final backend = useFakeBackend ? createFakeBackend() : await createFirebaseBackend();
+  final backend = createFakeBackend();
+  runApp(CampusFixApp(backend: backend));
 }
 
 class CampusFixApp extends StatelessWidget {
-  const CampusFixApp({super.key});
+  const CampusFixApp({super.key, required this.backend});
+
+  final Backend backend;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepository>.value(value: backend.auth),
+        RepositoryProvider<IncidentRepository>.value(value: backend.incidents),
+        RepositoryProvider<NotificationRepository>.value(value: backend.notifications),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => AuthCubit(backend.auth)),
+          BlocProvider(create: (_) => ThemeCubit()),
+        ],
+        child: const _RouterApp(),
+      ),
+    );
+  }
+}
+
+class _RouterApp extends StatefulWidget {
+  const _RouterApp();
+
+  @override
+  State<_RouterApp> createState() => _RouterAppState();
+}
+
+class _RouterAppState extends State<_RouterApp> {
+  late final GoRouter _router = createRouter(context.read<AuthCubit>());
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mode = context.watch<ThemeCubit>().state;
+    return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
-      // TODO(router): replace with MaterialApp.router + go_router config
-      // in lib/core/router/ once auth and feature screens exist.
-      home: const PlaceholderScreen(),
+      themeMode: mode,
+      routerConfig: _router,
     );
   }
 }
