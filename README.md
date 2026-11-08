@@ -64,11 +64,22 @@ Firebase Storage needs the paid Blaze plan, so photos go to Cloudinary (lecturer
 
 ### 4. Run
 
+With Firebase and Cloudinary configured:
+
 ```bash
-flutter run --dart-define-from-file=env.json
+flutter run --dart-define=FAKE_BACKEND=false --dart-define-from-file=env.json
 ```
 
 Without `env.json` the app still runs, but photo uploads show a "not configured" error.
+
+To try the UI without any setup, run it on in-memory demo data (the default):
+
+```bash
+flutter run
+```
+
+Demo accounts (any password of 6+ characters): `amina.hassan@alustudent.com` (student) and
+`jean.mugisha@alueducation.com` (staff).
 
 ## Checks
 
