@@ -8,7 +8,6 @@ Cloudinary for photos, and BLoC/Cubit for state. See [PLAN.md](PLAN.md) for the 
 
 ```
 lib/
-  config/        env.example.dart (copy to env.dart, git-ignored)
   core/          theme/ (colours, text styles, ThemeData), constants/, router/
   data/          repositories/, services/ (PhotoStorageService, ...)
   logic/         cubits + states
@@ -57,16 +56,19 @@ Firebase Storage needs the paid Blaze plan, so photos go to Cloudinary (lecturer
 3. Copy the env template and fill in your values:
 
    ```bash
-   cp lib/config/env.example.dart lib/config/env.dart
+   cp env.example.json env.json
    ```
 
-   `env.dart` is git-ignored. Never put the Cloudinary API secret in the app.
+   `env.json` is git-ignored. Never put the Cloudinary API secret in the app.
+   The values are passed at build time with `--dart-define-from-file` (below).
 
 ### 4. Run
 
 ```bash
-flutter run
+flutter run --dart-define-from-file=env.json
 ```
+
+Without `env.json` the app still runs, but photo uploads show a "not configured" error.
 
 ## Checks
 
