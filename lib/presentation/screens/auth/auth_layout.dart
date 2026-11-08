@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../widgets/brand_logo.dart';
 import '../../widgets/common.dart';
 import '../../widgets/theme_toggle_button.dart';
 
-/// ALU campus photo behind the top of the login/register screens.
-const authHeroAsset = 'assets/images/auth_hero.webp';
 
 /// Login/register frame: gradient backdrop, illustration on top and a
 /// rounded translucent card holding the title and form.
@@ -137,7 +136,7 @@ class _Hero extends StatelessWidget {
       width: double.infinity,
       child: Stack(fit: StackFit.expand, children: [
         Image.asset(
-          authHeroAsset,
+          AppConstants.campusPhoto,
           fit: BoxFit.cover,
           // The building sits in the lower half of the photo.
           alignment: const Alignment(0, 0.45),

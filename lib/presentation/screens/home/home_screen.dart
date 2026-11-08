@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_format.dart';
@@ -21,39 +22,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.select((AuthCubit c) => c.state.user)!;
-    final c = context.colors;
-    final t = Theme.of(context).textTheme;
-    final firstName = user.displayName.split(' ').first;
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${greeting()},', style: t.bodyMedium?.copyWith(color: c.textMuted)),
-                      Row(children: [
-                        Flexible(child: Text(firstName, style: t.headlineMedium, overflow: TextOverflow.ellipsis)),
-                        const SizedBox(width: 8),
-                        Icon(Symbols.waving_hand_rounded, color: c.sky, size: 26),
-                      ]),
-                    ],
-                  ),
-                ),
-                const ThemeToggleButton(),
-                const _BellButton(),
-                const SizedBox(width: 10),
-                UserAvatar(initials: user.initials),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text('Help make our campus safer. Report issues and follow them until they are fixed.',
-                style: t.bodyLarge?.copyWith(color: c.textMuted)),
+            const _HomeHeader(),
             const SizedBox(height: 20),
             const _HeroBanner(),
             const SizedBox(height: 24),
@@ -71,6 +45,72 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+/// Greeting card: campus photo under a navy→blue tint, white text and icons.
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.select((AuthCubit c) => c.state.user)!;
+    final c = context.colors;
+    final t = Theme.of(context).textTheme;
+    final onHero = c.onHero;
+    final radius = BorderRadius.circular(24);
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        image: const DecorationImage(
+          image: AssetImage(AppConstants.campusPhoto),
+          fit: BoxFit.cover,
+          alignment: Alignment(0, 0.45),
+        ),
+        boxShadow: [BoxShadow(color: c.deep.withValues(alpha: 0.2), blurRadius: 18, offset: const Offset(0, 8))],
+      ),
+      // Tint over the photo so white text stays readable in both themes.
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [const Color(0xFF1B365D).withValues(alpha: 0.92), const Color(0xFF005A9C).withValues(alpha: 0.72)],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 16, 14, 18),
+          child: IconTheme(
+          data: IconThemeData(color: onHero),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('${greeting()},', style: t.bodyMedium?.copyWith(color: onHero.withValues(alpha: 0.8))),
+                  Row(children: [
+                    Flexible(
+                      child: Text(user.displayName.split(' ').first,
+                          style: t.headlineMedium?.copyWith(color: onHero), overflow: TextOverflow.ellipsis),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(Symbols.waving_hand_rounded, color: c.sky, size: 26),
+                  ]),
+                ]),
+              ),
+              const ThemeToggleButton(),
+              const _BellButton(),
+              const SizedBox(width: 10),
+              UserAvatar(initials: user.initials),
+            ]),
+            const SizedBox(height: 10),
+            Text('Help make our campus safer. Report issues and follow them until they are fixed.',
+                style: t.bodyMedium?.copyWith(color: onHero.withValues(alpha: 0.85))),
+          ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _BellButton extends StatelessWidget {
   const _BellButton();
 
@@ -80,7 +120,7 @@ class _BellButton extends StatelessWidget {
     final c = context.colors;
     return IconButton.filled(
       tooltip: unread > 0 ? 'Alerts, $unread unread' : 'Alerts',
-      style: IconButton.styleFrom(backgroundColor: c.card, foregroundColor: c.navy),
+      style: IconButton.styleFrom(backgroundColor: c.onHero.withValues(alpha: 0.16), foregroundColor: c.onHero),
       onPressed: () => context.go(Routes.alerts),
       icon: Badge(isLabelVisible: unread > 0, smallSize: 9, backgroundColor: c.error, child: const Icon(Symbols.notifications_rounded)),
     );

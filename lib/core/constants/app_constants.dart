@@ -1,6 +1,9 @@
 abstract final class AppConstants {
   static const appName = 'CampusFix';
 
+  /// ALU campus photo used behind the sign-in screens and the Home header.
+  static const campusPhoto = 'assets/images/auth_hero.webp';
+
   /// Only ALU accounts may register.
   static const studentEmailDomain = 'alustudent.com';
   static const staffEmailDomain = 'alueducation.com';
