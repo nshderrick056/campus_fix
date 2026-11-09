@@ -134,51 +134,37 @@ class _HeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final t = Theme.of(context).textTheme;
+    // Light tinted card (theme tokens), so it doesn't repeat the photo header.
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
+        color: c.iceSoft,
         borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(colors: [Color(0xFF1B365D), Color(0xFF005A9C)]),
-        boxShadow: [BoxShadow(color: c.primary.withValues(alpha: 0.25), blurRadius: 20, offset: const Offset(0, 8))],
+        border: Border.all(color: c.ice.withValues(alpha: 0.6)),
       ),
       child: Stack(
         children: [
-          Positioned(right: -40, top: -50, child: CircleAvatar(radius: 85, backgroundColor: c.sky.withValues(alpha: 0.22))),
-          Positioned(right: 18, top: 18, child: Icon(Symbols.apartment_rounded, size: 84, color: const Color(0xFFA0E0EF).withValues(alpha: 0.55))),
+          Positioned(right: -40, top: -50, child: CircleAvatar(radius: 85, backgroundColor: c.sky.withValues(alpha: 0.18))),
+          Positioned(right: 18, top: 18, child: Icon(Symbols.apartment_rounded, size: 84, color: c.primary.withValues(alpha: 0.18))),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 210,
-                  child: Text('See an issue on campus?', style: t.titleLarge?.copyWith(color: c.onHero)),
-                ),
+                SizedBox(width: 210, child: Text('See an issue on campus?', style: t.titleLarge)),
                 const SizedBox(height: 6),
                 SizedBox(
                   width: 230,
                   child: Text('Report it in under a minute and help improve our learning environment.',
-                      style: t.bodyMedium?.copyWith(color: c.onHero.withValues(alpha: 0.85))),
+                      style: t.bodyMedium?.copyWith(color: c.textMuted)),
                 ),
                 const SizedBox(height: 16),
-                Material(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () => context.push(Routes.newReport),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      child: Row(children: [
-                        Icon(Symbols.add_circle_rounded, color: Color(0xFF005A9C), size: 26),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text('Report an Issue',
-                              style: TextStyle(color: Color(0xFF005A9C), fontWeight: FontWeight.w700, fontSize: 15)),
-                        ),
-                        Icon(Symbols.chevron_right_rounded, color: Color(0xFF005A9C)),
-                      ]),
-                    ),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => context.push(Routes.newReport),
+                    icon: const Icon(Symbols.add_circle_rounded),
+                    label: const Text('Report an Issue'),
                   ),
                 ),
               ],
