@@ -137,7 +137,7 @@ class _Body extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
       children: [
         if (incident.hasPhoto) ...[
-          IncidentPhoto(url: incident.photoUrl, fallbackIcon: incident.category.icon, height: 200, radius: 16),
+          IncidentPhoto(url: incident.photoUrl, fallbackIcon: incident.category.icon, height: 200, radius: 16, expandable: true),
           const SizedBox(height: 16),
         ],
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
