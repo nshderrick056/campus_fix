@@ -120,8 +120,8 @@ class FirestoreIncidentRepository implements IncidentRepository {
           throw const RepositoryException('locked',
               'Reports cannot be deleted once staff start working on them.');
         }
-        // The Cloudinary asset stays (deleting needs a signed request; see
-        // PLAN.md "future work").
+        // The Cloudinary asset stays: deleting it needs a signed (server-side)
+        // request, which is future work.
         await _incidents.doc(id).delete();
       });
 

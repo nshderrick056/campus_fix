@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// CampusFix security rules. They enforce the rules in docs/CONTRACT.md; the
+// CampusFix security rules. These are the real access control; the
 // app's own checks only give friendlier messages.
 service cloud.firestore {
   match /databases/{database}/documents {

@@ -2,7 +2,7 @@
 
 Students report campus issues (facilities, water, electricity, safety, ...) and staff
 update their status. Built with Flutter (Android target), Firebase Auth, Cloud Firestore,
-Cloudinary for photos, and BLoC/Cubit for state. See [PLAN.md](PLAN.md) for the full plan.
+Cloudinary for photos, and BLoC/Cubit for state.
 
 ## Project structure
 

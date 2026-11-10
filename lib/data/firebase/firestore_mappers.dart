@@ -9,7 +9,7 @@ import '../../models/incident_status.dart';
 import '../../models/status_change.dart';
 
 /// Converts between Firestore documents and the app's models.
-/// Layout: see docs/CONTRACT.md ("Firestore layout").
+/// Layout: users/{uid}, users/{uid}/notifications/{id}, incidents/{id}.
 
 typedef Json = Map<String, dynamic>;
 
